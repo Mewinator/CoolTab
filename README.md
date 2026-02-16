@@ -23,4 +23,4 @@ You need to run this somewhere, it doesn't matter where, Github Pages, Vercel, o
 - Not all guidelines are displayed here.
 
 #### Also...
-- Please tell people who made it, its not required but I want to be credited.
+- Please tell people who made it, its not required but I want to be credited.z 

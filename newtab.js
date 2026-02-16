@@ -1,3 +1,13 @@
+if (localStorage.getItem('changelog_read_status') === null) { localStorage.setItem('changelog_read_status', 'n'); }
+if (localStorage.getItem('changelog_read_status') === 'n') {
+    const dialog = document.getElementById('changelog');
+    dialog.showModal();
+}
+function hideChangelog() {
+    const dialog = document.getElementById('changelog');
+    dialog.close();
+    localStorage.setItem('changelog_read_status', 'y');
+}
 function updateTime() {
     const ampm = document.getElementById('ampm');
     const time = document.getElementById('hhmmss');
