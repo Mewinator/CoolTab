@@ -1,21 +1,86 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Settings</title>
+        <title>CoolTab / Settings</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Google+Sans" rel="stylesheet">
+        <link rel="icon" href="./img/CoolTab.svg">
         <style>
-            body {
+            html, body {
                 width: 100%;
                 height: 100%;
-                display: flex;
                 overflow: hidden;
-                align-items: center;
-                justify-content: center;
-                font-family: Arial, Helvetica, sans-serif;
+                color: white;
+                font-family: 'Inter';
+                background: #282828;
+                margin: 0;
             }
+            body { display: flex; }
+            [glass] {
+                background: #282828B5;
+                backdrop-filter: blur(15px) contrast(80%);
+                box-shadow: 0 0 10px rgba(0,0,0,0.5);
+                transition: all 0.2s ease-in-out;
+            }
+            aside {
+                padding: 10px 24px;
+                background: #3B3B3B;
+                height: 100%;
+                width: 250px;
+                gap: 32px;
+            }
+            .logo { display: flex; flex-direction: row; gap: 12px; cursor: pointer; }
+            main {
+                width: 100%;
+                height: 100%;
+                grid-template-rows: auto;
+                grid-template-columns: 3;
+                gap: 12px;
+                background: none;
+                padding: 16px 32px;
+            }
+            .item {
+                background: #2d2d2d;
+                border-radius: 18px;
+                width: fit-content;
+                height: fit-content;
+                padding: 8px;
+                display: flex;
+                align-items: center;
+                flex-direction: column;
+            }
+            .item button {
+                background: #3B3B3B;
+                border-radius: 12px;
+                color: white;
+                border: none;
+                display: flex;
+                flex-direction: row;
+                font-size: 20px;
+                padding: 8px 24px;
+                transition: transform 0.16s ease;
+            }
+            .item button:hover { cursor: pointer; transform: scale(1.05); }
         </style>
     </head>
     <body>
-        <h1>Coming soon!</h1>
+        <aside>
+            <div class="logo" onclick="window.location.href='./index.html'">
+                <img src="./img/CoolTab.svg" style="width: 54px; height: 54px;">
+                <h1 style="font-size: 24px; font-weight: 500;">CoolTab</h1>
+            </div>
+            <img src="https://placehold.co/200x600/282828/ffffff?text=Placeholder ad" style="position: fixed; bottom: 18px;">
+        </aside>
+        <main>
+            <div class="item">
+                <img id="previewImage" src="taptappingu.gif" alt="Background preview" style="border-radius: 16px; width: 264px; height: auto;">
+                <h2>Background image</h2>
+                <input type="file" id="fileUpload" accept=".jpg, .png, .gif, .jpeg" style="display:none;">
+                <button onclick="document.getElementById('fileUpload').click();">Upload<span class="material-symbols-outlined">upload</span></button>
+            </div>
+        </main>
+        <script src="./settings.js"></script>
     </body>
 </html>

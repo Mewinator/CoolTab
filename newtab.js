@@ -1,12 +1,12 @@
-if (localStorage.getItem('changelog_read_status') === null) { localStorage.setItem('changelog_read_status', 'n'); }
-if (localStorage.getItem('changelog_read_status') === 'n') {
+if (localStorage.getItem('cooltab_changelog_read_status') === null) { localStorage.setItem('cooltab_changelog_read_status', 'n'); }
+if (localStorage.getItem('cooltab_changelog_read_status') === 'n') {
     const dialog = document.getElementById('changelog');
     dialog.showModal();
 }
 function hideChangelog() {
     const dialog = document.getElementById('changelog');
     dialog.close();
-    localStorage.setItem('changelog_read_status', 'y');
+    localStorage.setItem('cooltab_changelog_read_status', 'y');
 }
 function updateTime() {
     const ampm = document.getElementById('ampm');
@@ -86,10 +86,10 @@ const apps = {
     './img/gemini.png': 'https://gemini.google.com/',
     './img/claude.svg': 'https://claude.ai'
 };
-localStorage.setItem('apps', JSON.stringify(apps));
+localStorage.setItem('cooltab_apps', JSON.stringify(apps));
 function loadApps() {
     const grid = document.querySelector('.apps_grid');
-    const apps = JSON.parse(localStorage.getItem('apps'));
+    const apps = JSON.parse(localStorage.getItem('cooltab_apps'));
     for (const icon in apps) {
         const link = document.createElement('a');
         link.href = apps[icon];
@@ -109,4 +109,15 @@ window.addEventListener('click', (e) => {
         hideApps();
     }
 });
+function updateBg() {
+    const stored = localStorage.getItem('cooltab_background');
+    const body = document.querySelector('body');
+    const bgUrl = stored ? stored : './taptappingu.gif';
+    body.style.backgroundImage = `url(${bgUrl})`;
+    body.style.backgroundRepeat = 'no-repeat';
+    body.style.backgroundSize = 'cover';
+    body.style.backgroundAttachment = 'fixed';
+    body.style.backgroundPosition = 'center';
+}
+updateBg();
 loadApps();

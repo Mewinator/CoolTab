@@ -13,6 +13,8 @@
                 height: 100%;
                 background: url('./taptappingu.gif') no-repeat;
                 background-size: cover;
+                background-attachment: fixed;
+                background-position: center;
                 overflow-x: hidden;
                 color: white;
                 font-family: 'Inter';
@@ -145,7 +147,7 @@
             }
             #clock_shell iframe { height: 66px; width: 66px; border: none; }
             #clock_shell span { color: white; }
-            .widgets { color: white; font-size: 24px; display: flex; flex-direction: row; align-items: center; gap: 12px; }
+            .widgets { color: white; font-size: 24px; display: flex; flex-direction: row; align-items: center; gap: 12px; border-radius: 16px; padding: 10px 24px; }
             .widgets a { text-decoration: none; }
             #apps {
                 position: absolute;
@@ -233,7 +235,7 @@
         </style>
     </head>
     <body>
-        <span style="position: absolute; top: 1px; left: 1.5px; color: white; font-size: 12px;">Under Apache-2.0 License - Version 1.1 by Mewinator</span>
+        <span style="position: absolute; top: 1px; left: 1.5px; color: white; font-size: 12px;">Under Apache-2.0 License - Version 1.2 by Mewinator</span>
         <nav>
             <div id="clock_shell">
                 <iframe src="./clock.html"></iframe>
@@ -244,7 +246,7 @@
                     <span id="ampm"></span>
                 </div>
             </div>
-            <div class="widgets">
+            <div class="widgets" glass>
                 <a style="color: white;" id="mail" href="https://mail.google.com/"><span>Mail</span></a>
                 <span id="app_button" class="material-symbols-outlined" style="cursor: pointer; font-size: 32px;">apps</span>
                 <span class="material-symbols-outlined" style="cursor: pointer; font-size: 32px;" onclick="window.location.href='./settings.html'">settings</span>
@@ -283,13 +285,12 @@
                 </svg>
             </div>
             <div class="content">
-                <h1>Cooltab version 1.1</h1>
+                <h1>Cooltab version 1.2</h1>
                 <img src="./img/CoolTab.svg">
-                <h3>Changelog</h3>
-                <ul>
-                    <li>Added changelog menu</li>
-                    <li>There is now a logo!</li>
-                    <li>New settings page</li>
+                <h2>Changelog</h2>
+                <ul style="font-size: 20px;">
+                    <li>Settings page has its first item.</li>
+                    <li>New background customization.</li>
                 </ul>
                 <button onclick="hideChangelog()">Close</button>
             </div>
