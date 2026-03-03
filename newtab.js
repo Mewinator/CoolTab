@@ -1,6 +1,4 @@
 console.log('newtab.js loaded');
-
-// global error handlers to catch issues preventing logs
 window.addEventListener('error', e => console.error('window error', e.error || e.message || e));
 window.addEventListener('unhandledrejection', e => console.error('unhandled promise rejection', e.reason));
 
@@ -78,7 +76,6 @@ function setupSearch() {
             suggestionsContainer.classList.remove('active');
         }
     });
-
     document.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             const url = 'https://duckduckgo.com/search?q=';
@@ -86,7 +83,6 @@ function setupSearch() {
         }
     });
 }
-
 const defaultApps = {
     'Gmail': { url: 'https://mail.google.com/', icon: './img/gmail.png' },
     'Github': { url: 'https://github.com', icon: './img/github.svg' },
@@ -142,7 +138,6 @@ function installAppHandlers() {
         }
     });
 }
-
 let _currentBgUrl = null;
 async function updateBg() {
     const stored = await Storage.get('cooltab_background');
@@ -165,7 +160,6 @@ async function updateBg() {
     body.style.backgroundAttachment = 'fixed';
     body.style.backgroundPosition = 'center';
 }
-
 async function main() {
     await Storage.init();
     await initChangelog();
