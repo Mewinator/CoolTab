@@ -3,7 +3,6 @@ const Storage = (() => {
     const STORE_NAME = 'data';
     let dbPromise = null;
     const ROOT_KEY = 'cooltab_root';
-
     function openDB() {
         if (dbPromise) return dbPromise;
         dbPromise = new Promise((resolve, reject) => {
@@ -19,8 +18,6 @@ const Storage = (() => {
         });
         return dbPromise;
     }
-
-    // low-level helpers that ignore the "root" object entirely
     async function _getRaw(key) {
         const db = await openDB();
         const tx = db.transaction(STORE_NAME, 'readonly');
@@ -34,7 +31,6 @@ const Storage = (() => {
             req.onerror = () => reject(req.error);
         });
     }
-
     async function _setRaw(key, blob) {
         const db = await openDB();
         const tx = db.transaction(STORE_NAME, 'readwrite');
@@ -45,7 +41,6 @@ const Storage = (() => {
             tx.onerror = () => reject(tx.error);
         });
     }
-
     async function _deleteRaw(key) {
         const db = await openDB();
         const tx = db.transaction(STORE_NAME, 'readwrite');
@@ -56,8 +51,6 @@ const Storage = (() => {
             tx.onerror = () => reject(tx.error);
         });
     }
-
-    // utilities for managing the root-json object
     async function readRoot() {
         const blob = await _getRaw(ROOT_KEY);
         if (!blob) return null;
@@ -71,20 +64,15 @@ const Storage = (() => {
         }
         return null;
     }
-
     async function writeRoot(obj) {
         const blob = new Blob([JSON.stringify(obj)], { type: 'application/json' });
         await _setRaw(ROOT_KEY, blob);
     }
-
     function keyToProp(key) {
         if (!key) return key;
         return key.replace(/^cooltab_/, '');
     }
-
     async function setItem(key, value) {
-        // if we already have a root object and value isn't a blob, store
-        // it inside the root; otherwise fall back to raw key/value.
         const prop = keyToProp(key);
         const root = await readRoot();
         const isBlob = value instanceof Blob;
@@ -93,8 +81,6 @@ const Storage = (() => {
             await writeRoot(root);
             return;
         }
-
-        // otherwise behave like the old implementation
         let blob;
         if (isBlob) {
             blob = value;
@@ -113,8 +99,6 @@ const Storage = (() => {
         if (root !== null && key !== ROOT_KEY && prop in root) {
             return root[prop];
         }
-
-        // fallback to raw retrieval
         const blob = await _getRaw(key);
         if (!blob) return null;
         if (blob.type === 'application/json') {
@@ -158,11 +142,9 @@ const Storage = (() => {
             }
         }
     }
-
     async function migrateToRoot() {
         const existing = await readRoot();
         if (existing !== null) {
-            // already migrated or root in use
             return;
         }
         const keys = ['cooltab_apps', 'cooltab_bg_blendpx', 'cooltab_changelog_read_status'];
@@ -178,7 +160,6 @@ const Storage = (() => {
             await writeRoot(root);
         }
     }
-
     async function init() {
         await openDB();
         await migrateLocalStorage();
