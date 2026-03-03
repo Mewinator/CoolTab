@@ -1,4 +1,3 @@
-![Logo](./img/CoolTab.svg) 
 # CoolTab
 ### Like a newtab, but with more stuff
 ## Setup
