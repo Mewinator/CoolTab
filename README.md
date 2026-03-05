@@ -11,7 +11,7 @@ You need to run this somewhere, it doesn't matter where, Github Pages, Vercel, o
 - [x] Add a settings menu
 - [ ] Make it so you can save your own app grids and customize them
 - [ ] Alternative search engines, currently it's all DuckDuckGo
-- [partial] Allow custom wallpapers and themes
+- [x] Allow custom wallpapers and themes
 - [ ] Add more widgets and make them customizable
 - [ ] Introducing a feature to change apps on the bottom bar
 
