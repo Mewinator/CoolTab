@@ -8,25 +8,33 @@
         <link href="https://fonts.googleapis.com/css?family=Google+Sans" rel="stylesheet">
         <link rel="icon" href="./img/CoolTab.svg">
         <style>
+            :root {
+                --bg: #282828;
+                --glass-bg: #282828B5;
+                --secondary: #2d2d2d;
+                --tertiary: #3B3B3B;
+                --text-primary: #ffffff;
+                --text-secondary: #c8c8c8;
+            }
             html, body {
                 width: 100%;
                 height: 100%;
                 overflow: hidden;
-                color: white;
+                color: var(--text-primary);
                 font-family: 'Inter';
-                background: #282828;
+                background: var(--bg);
                 margin: 0;
             }
             body { display: flex; }
             [glass] {
-                background: #282828B5;
+                background: var(--glass-bg);
                 backdrop-filter: blur(15px) contrast(80%);
                 box-shadow: 0 0 10px rgba(0,0,0,0.5);
                 transition: all 0.2s ease-in-out;
             }
             aside {
                 padding: 10px 24px;
-                background: #3B3B3B;
+                background: var(--tertiary);
                 height: 100%;
                 width: 250px;
                 gap: 32px;
@@ -35,27 +43,29 @@
             main {
                 width: 100%;
                 height: 100%;
-                grid-template-rows: auto;
-                grid-template-columns: 3;
+                display: flex;
+                flex-wrap: wrap;
                 gap: 12px;
                 background: none;
                 padding: 16px 32px;
             }
             .item {
-                background: #2d2d2d;
-                border-radius: 18px;
+                background: var(--secondary);
+                border-radius: 20px;
                 width: fit-content;
                 height: fit-content;
                 padding: 8px;
                 display: flex;
                 align-items: center;
                 flex-direction: column;
-                gap: 12px;
+                gap: 6px;
+                min-height: 340px;
+                min-width: 280px;
             }
             .item button {
-                background: #3B3B3B;
+                background: var(--tertiary);
                 border-radius: 12px;
-                color: white;
+                color: var(--text-primary);
                 border: none;
                 display: flex;
                 flex-direction: row;
@@ -64,6 +74,15 @@
                 transition: transform 0.16s ease;
             }
             .item button:hover { cursor: pointer; transform: scale(1.05); }
+            .var-line {
+                display: flex;
+                gap: 4px;
+                padding: 2px 4px;
+                border-radius: 4px;
+            }
+            .var-line:hover { background: var(--secondary); cursor: pointer; }
+            .var-line .colon { margin: 0 2px; }
+            #varPanel { margin-top: 12px; }
         </style>
     </head>
     <body>
@@ -76,14 +95,20 @@
         </aside>
         <main>
             <div class="item">
-                <img id="previewImage" src="taptappingu.gif" alt="Background preview" style="border-radius: 16px; width: 264px; height: auto;">
+                <img id="previewImage" src="taptappingu.gif" alt="Background preview" style="border-radius: 16px 16px 8px 8px; width: 264px; height: auto;">
+                <span id="imgText" style="color: var(--text-secondary);"></span>
                 <h2>Background image</h2>
                 <input type="file" id="fileUpload" accept=".jpg, .png, .gif, .jpeg" style="display:none;">
                 <div>
                     <input type="checkbox" id="blend_px">
-                    <span>Blend pixels</span>
+                    <span>Do not blend pixels</span>
                 </div>
                 <button onclick="document.getElementById('fileUpload').click();">Upload<span class="material-symbols-outlined">upload</span></button>
+            </div>
+            <div class="item">
+                <h2>Theme colors</h2>
+                <div style="background: var(--bg); border-radius: 16px; padding: 12px;" id="themeOutput"></div>
+                <div id="varPanel"></div>
             </div>
         </main>
         <script src="./storage.js"></script>

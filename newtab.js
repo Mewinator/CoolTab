@@ -1,4 +1,3 @@
-console.log('newtab.js loaded');
 window.addEventListener('error', e => console.error('window error', e.error || e.message || e));
 window.addEventListener('unhandledrejection', e => console.error('unhandled promise rejection', e.reason));
 
@@ -12,11 +11,16 @@ async function initChangelog() {
         const dialog = document.getElementById('changelog');
         dialog.showModal();
     }
+    if (status === 'y') {
+        const dialog = document.getElementById('changelog');
+        dialog.style.display = 'none';
+    }
 }
-function hideChangelog() {
+async function hideChangelog() {
     const dialog = document.getElementById('changelog');
     dialog.close();
-    Storage.set('cooltab_changelog_read_status', 'y');
+    dialog.style.display = 'none';
+    await Storage.set('cooltab_changelog_read_status', 'y');
 } 
 function updateTime() {
     const ampm = document.getElementById('ampm');
@@ -37,7 +41,6 @@ function updateTime() {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     date.textContent = days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
 }
-// DOM-dependent initialization inside DOMContentLoaded
 let search, searchBar, suggestionsContainer, debounceTimeout;
 
 function setupSearch() {
@@ -160,22 +163,28 @@ async function updateBg() {
     body.style.backgroundAttachment = 'fixed';
     body.style.backgroundPosition = 'center';
 }
+async function loadTheme() {
+    const theme = await Storage.get('cooltab_theme');
+    if (theme && typeof theme === 'object') {
+        for (const [name, value] of Object.entries(theme)) {
+            document.documentElement.style.setProperty(`--${name}`, value);
+        }
+    }
+}
 async function main() {
     await Storage.init();
+    await loadTheme();
     await initChangelog();
     updateTime();
     setInterval(updateTime, 100);
     await updateBg();
     await loadApps();
     const bg_blendpx = await Storage.get('cooltab_bg_blendpx');
-    console.log('bg_blendpx loaded from storage:', bg_blendpx);
     if (bg_blendpx === true || bg_blendpx === 'True' || bg_blendpx === 'true') {
         document.querySelector('body').style.imageRendering = 'pixelated';
-        console.log('applied pixelated background');
     }
 }
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOMContentLoaded fired');
     setupSearch();
     installAppHandlers();
     main().catch(err => console.error('error in main()', err));
