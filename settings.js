@@ -85,14 +85,28 @@ async function formatVariables() {
     }
 }
 async function saveCurrentTheme() {
-    const rootStyle = getComputedStyle(document.documentElement);
     const theme = {};
-    for (let i = 0; i < rootStyle.length; i++) {
-        const prop = rootStyle[i];
-        if (!prop.startsWith('--')) continue;
-        const value = rootStyle.getPropertyValue(prop).trim();
-        const name = prop.slice(2);
-        theme[name] = value;
+    const declared = new Set();
+    for (let sheet of document.styleSheets) {
+        try {
+            for (let rule of sheet.cssRules) {
+                if (rule.selectorText === ':root') {
+                    for (let i = 0; i < rule.style.length; i++) {
+                        const prop = rule.style[i];
+                        if (prop.startsWith('--')) {
+                            const name = prop.slice(2);
+                            declared.add(name);
+                            theme[name] = rule.style.getPropertyValue(prop);
+                        }
+                    }
+                }
+            }
+        } catch (e) {}
+    }
+    const rootStyle = getComputedStyle(document.documentElement);
+    for (let prop of declared) {
+        const value = rootStyle.getPropertyValue(`--${prop}`).trim();
+        theme[prop] = value;
     }
     await Storage.set('cooltab_theme', theme);
 }
