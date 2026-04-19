@@ -147,7 +147,7 @@ const Storage = (() => {
         if (existing !== null) {
             return;
         }
-        const keys = ['cooltab_apps', 'cooltab_bg_blendpx', 'cooltab_changelog_read_status'];
+        const keys = ['cooltab_apps', 'apps', 'cooltab_bg_blendpx', 'cooltab_changelog_read_status', 'cooltab_pinned'];
         const root = {};
         for (const key of keys) {
             const val = await getItem(key);

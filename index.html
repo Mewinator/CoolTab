@@ -2,7 +2,14 @@
 <html>
     <head>
         <title>Cooltab</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-M87MZBH2TM"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){ dataLayer.push(arguments); }
+            gtag('js', new Date());
+            gtag('config', 'G-M87MZBH2TM');
+        </script>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Google+Sans" rel="stylesheet">
@@ -40,13 +47,16 @@
                 border-radius: 24px;
                 padding: 12px 50px;
                 height: 48px;
-                width: clamp(1200px, 1224px, 90%);
+                max-width: 90%;
+                min-width: fit-content;
+                width: 1500px;
                 position: absolute;
                 left: 50%;
                 transform: translateX(-50%);
                 bottom: 16px;
                 gap: 12px;
             }
+            .bottom_bar img { border-radius: 8px; }
             img { width: 48px; height: 48px; transition: transform 0.16s ease-in-out; }
             img:hover { transform: scale(1.1); }
             .search_bar {
@@ -160,13 +170,14 @@
             .widgets a { text-decoration: none; }
             #apps {
                 position: absolute;
-                top: 110px;
-                right: -80%;
                 z-index: 1000;
                 padding: 0;
                 border: none;
                 border-radius: 16px;
                 overflow-x: hidden;
+                position-anchor: --apps-button;
+                position-area: bottom span-left;
+                top: 20px;
             }
             #apps:not([open]) { display: none; }
             .apps_grid {
@@ -252,9 +263,7 @@
                 display: flex;
                 flex-direction: column;
             }
-            #changelog header {
-                flex-shrink: 0;
-            }
+            #changelog header { flex-shrink: 0; }
             #changelog .content::-webkit-scrollbar { display: none; }
             #changelog .content {
                 padding: 16px 32px;
@@ -288,7 +297,7 @@
         </style>
     </head>
     <body>
-        <span style="position: absolute; top: 1px; left: 1.5px; color: var(--text-primary); font-size: 12px;">Under Apache-2.0 License - Version 1.4 by Mewinator</span>
+        <span style="position: absolute; top: 1px; left: 1.5px; color: var(--text-primary); font-size: 12px;">Under Apache-2.0 License - Version 1.5 by Mewinator</span>
         <nav>
             <div id="clock_shell">
                 <iframe src="./clock.html"></iframe>
@@ -301,7 +310,7 @@
             </div>
             <div class="widgets" glass>
                 <a style="color: var(--text-primary);" id="mail" href="https://mail.google.com/"><span>Mail</span></a>
-                <span id="app_button" class="material-symbols-outlined" style="cursor: pointer; font-size: 32px;">apps</span>
+                <span id="app_button" class="material-symbols-outlined" style="cursor: pointer; font-size: 32px; anchor-name: --apps-button;">apps</span>
                 <span class="material-symbols-outlined" style="cursor: pointer; font-size: 32px;" onclick="window.location.href='./settings.html'">settings</span>
             </div>
         </nav>
@@ -313,11 +322,7 @@
             <!--<a href="[(AI URL)]"><button class="ai init"><span>[(AI NAME)]</span></button></a>-->
         </div>
         <div id="suggestions"></div>
-        <div glass class=" bottom_bar">
-            <a title="Firebase Studio - My personal favorite vscode editor on the web" href="https://studio.firebase.google.com"><img style="width: 53px; height: 53px;" src="./img/firebase.png"></a>
-            <a title="Onecompiler - Fast online code editor of choice" href="https://onecompiler.com"><img src="./img/onecompiler.png"></a>
-            <a title="Figma - Design editor for UI/UX" href="https://figma.com"><img style="border-radius: 9px;" src="./img/figma.png"></a>
-            <a title="Github - Hmm.. lots of code" href="https://github.com"><img style="border-radius: 9px;" src="./img/github.svg"></a>
+        <div glass class="bottom_bar">
         </div>
         <dialog glass id="apps">
             <div style="display: flex; align-items: center; background: #4c4c4c; height: 16px; width: 100%; border-radius: 16px 16px 0 0; padding: 6px;">
@@ -338,28 +343,31 @@
                 </svg>
             </header>
             <div class="content">
-                <h1>Cooltab version 1.4</h1>
+                <h1>Cooltab version 1.5</h1>
+                <br>
+                <br>
                 <h2>Changelog / Notes</h2>
                 <ul style="font-size: 20px;">
                     <li>Settings Page
                         <ul>
-                            <li>Fixed layout to use flexbox wrapping for better item stackin.</li>
-                            <li>Theme colors section now displays all CSS custom properties.</li>
+                            <li>Added new card for customizing and re-organising your apps.</li>
                         </ul>
                     </li>
-                    <li>Theme Editor
+                    <li>Apps
                         <ul>
-                            <li>Click any theme variable to expand an edit panel.</li>
-                            <li>You can modify the theme colors.</li>
-                            <li>Theme data applies to all pages.</li>
+                            <li>Now you can re-organise your apps grid.</li>
+                            <li>Pinning apps puts them on the bottom bar.</li>
                         </ul>
                     </li>
-                    <li>Background Image
-                        <ul>
-                            <li>Display filename of uploaded background image</li>
-                        </ul>
+                </ul>
+                <ul style="font-size: 20px;">
+                    <li>I'm still working out a name for the <i>Bottom Bar</i> but these are what you can call it:
+                    <ul>
+                        <li>Bottom Bar</li>
+                        <li>Pinned Apps</li>
+                        <li>Shortcuts Bar</li>
+                    </ul>
                     </li>
-                    <li>The changelog has been modified so that the content is scrollable and you can see the header and close button at all times.</li>
                 </ul>
             </div>
             <footer>

@@ -60,6 +60,7 @@ async function main() {
     await Storage.init();
     await loadTheme();
     await formatVariables();
+    await loadApps();
 }
 async function formatVariables() {
     const theme = await Storage.get('cooltab_theme');
@@ -135,3 +136,284 @@ function showVarPanel(name, value) {
 document.addEventListener('DOMContentLoaded', () => {
     main().catch(err => console.error('error in main()', err));
 });
+async function loadApps() {
+    try {
+        let apps = await Storage.get('cooltab_apps');
+        if (!apps || typeof apps !== 'object') apps = {};
+        const appsArray = Object.entries(apps).map(([name, data]) => ({
+            name,
+            url: data.url || '',
+            icon: data.icon || ''
+        }));
+        renderApps(appsArray);
+    } catch (e) {
+        console.error('Failed to load apps', e);
+    }
+}
+let selectedAppIndex = null;
+
+function renderApps(apps) {
+    const container = document.getElementById('appsList');
+    container.innerHTML = '';
+    apps.forEach((app, index) => {
+        const item = document.createElement('div');
+        item.className = 'app-item';
+        item.draggable = true;
+        item.dataset.index = index;
+        item.style.position = 'relative';
+        const icon = document.createElement('img');
+        icon.className = 'app-icon';
+        icon.src = app.icon || `https://favicon.is/${app.url}?larger=true`;
+        const name = document.createElement('span');
+        name.className = 'app-name';
+        name.textContent = app.name;
+        item.appendChild(icon);
+        item.appendChild(name);
+        
+        Storage.get('cooltab_pinned').then(p => {
+            const pinnedApps = p || {};
+            const isPinned = pinnedApps[app.name];
+            const pinBtn = document.createElement('button');
+            pinBtn.style.position = 'absolute';
+            pinBtn.style.top = '4px';
+            pinBtn.style.right = '4px';
+            pinBtn.style.background = 'var(--tertiary)';
+            pinBtn.style.border = 'none';
+            pinBtn.style.color = 'var(--text-primary)';
+            pinBtn.style.cursor = 'pointer';
+            pinBtn.style.padding = '4px';
+            pinBtn.style.borderRadius = '4px';
+            pinBtn.style.fontSize = '18px';
+            pinBtn.style.display = 'flex';
+            pinBtn.style.alignItems = 'center';
+            pinBtn.style.justifyContent = 'center';
+            pinBtn.style.width = '26px';
+            pinBtn.style.height = '26px';
+            pinBtn.style.transition = 'opacity 0.16s ease-in-out';
+            pinBtn.style.zIndex = '10';
+            // If pinned (keep_off), always visible; if not pinned (keep), hidden initially
+            pinBtn.style.opacity = isPinned ? '1' : '0';
+            pinBtn.style.pointerEvents = isPinned ? 'auto' : 'none';
+            pinBtn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px; line-height: 1; display: flex;">${isPinned ? 'keep_off' : 'keep'}</span>`;
+            pinBtn.onclick = (e) => {
+                e.preventDefault();
+                togglePinApp(app.name, app, !isPinned);
+            };
+            item.appendChild(pinBtn);
+            item.addEventListener('mouseenter', () => {
+                pinBtn.style.opacity = '1';
+                pinBtn.style.pointerEvents = 'auto';
+            });
+            item.addEventListener('mouseleave', () => {
+                // Hide pin button on mouseleave only if not pinned
+                if (!isPinned) {
+                    pinBtn.style.opacity = '0';
+                    pinBtn.style.pointerEvents = 'none';
+                }
+            });
+        });
+        
+        item.addEventListener('click', (e) => {
+            if (e.target.closest('button')) return;
+            document.querySelectorAll('.app-item').forEach(i => i.classList.remove('selected'));
+            item.classList.add('selected');
+            selectedAppIndex = index;
+            updateAppControls(index);
+        });
+        
+        container.appendChild(item);
+    });
+    setupDragAndDrop();
+}
+
+function updateAppControls(index) {
+    const appControls = document.querySelector('.app-controls');
+    let editBtn = appControls.querySelector('#editSelectedAppBtn');
+    
+    if (editBtn) {
+        editBtn.remove();
+    }
+    
+    if (index !== null) {
+        const editButton = document.createElement('button');
+        editButton.id = 'editSelectedAppBtn';
+        editButton.className = 'control-btn';
+        editButton.style.background = 'none';
+        editButton.style.padding = '0';
+        editButton.title = 'Edit selected app';
+        editButton.innerHTML = '<span class="material-symbols-outlined">edit</span>';
+        editButton.onclick = () => editApp(index);
+        appControls.appendChild(editButton);
+    }
+}
+async function togglePinApp(name, app, pin) {
+    let pinned = await Storage.get('cooltab_pinned') || {};
+    if (pin) {
+        pinned[name] = { url: app.url, icon: app.icon };
+    } else {
+        delete pinned[name];
+    }
+    await Storage.set('cooltab_pinned', pinned);
+    const apps = await Storage.get('cooltab_apps') || {};
+    const appsArray = Object.entries(apps).map(([appName, data]) => ({
+        name: appName,
+        url: data.url || '',
+        icon: data.icon || ''
+    }));
+    selectedAppIndex = null;
+    renderApps(appsArray);
+}
+function setupDragAndDrop() {
+    const items = document.querySelectorAll('.app-item');
+    const bin = document.getElementById('recycleBin');
+    let draggedIndex = null;
+    let draggedElement = null;
+    items.forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+            draggedIndex = parseInt(item.dataset.index);
+            draggedElement = item;
+            item.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setDragImage(new Image(), 0, 0);
+        });
+        item.addEventListener('dragend', (e) => {
+            if (draggedElement) {
+                draggedElement.classList.remove('dragging');
+                draggedElement = null;
+            }
+        });
+        item.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        });
+        item.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const targetIndex = parseInt(item.dataset.index);
+            if (draggedIndex !== null && draggedIndex !== targetIndex) {
+                reorderApps(draggedIndex, targetIndex);
+            }
+        });
+    });
+    bin.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    });
+    bin.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (draggedIndex !== null) {
+            deleteApp(draggedIndex);
+        }
+    });
+}
+async function reorderApps(from, to) {
+    try {
+        let appsObj = await Storage.get('cooltab_apps') || {};
+        const appsArray = Object.entries(appsObj).map(([name, data]) => ({
+            name,
+            url: data.url || '',
+            icon: data.icon || ''
+        }));
+        const [moved] = appsArray.splice(from, 1);
+        appsArray.splice(to, 0, moved);
+        
+        const newAppsObj = {};
+        appsArray.forEach(app => {
+            newAppsObj[app.name] = { url: app.url, icon: app.icon };
+        });
+        await Storage.set('cooltab_apps', newAppsObj);
+        selectedAppIndex = null;
+        renderApps(appsArray);
+    } catch (e) {
+        console.error('Failed to reorder apps', e);
+    }
+}
+async function deleteApp(index) {
+    try {
+        let appsObj = await Storage.get('cooltab_apps') || {};
+        const appsArray = Object.entries(appsObj).map(([name, data]) => ({
+            name,
+            url: data.url || '',
+            icon: data.icon || ''
+        }));
+        const deletedApp = appsArray.splice(index, 1)[0];
+        
+        const newAppsObj = {};
+        appsArray.forEach(app => {
+            newAppsObj[app.name] = { url: app.url, icon: app.icon };
+        });
+        await Storage.set('cooltab_apps', newAppsObj);
+        selectedAppIndex = null;
+        renderApps(appsArray);
+    } catch (e) {
+        console.error('Failed to delete app', e);
+    }
+}
+async function editApp(index) {
+    try {
+        let appsObj = await Storage.get('cooltab_apps') || {};
+        const appsArray = Object.entries(appsObj).map(([name, data]) => ({
+            name,
+            url: data.url || '',
+            icon: data.icon || ''
+        }));
+        const app = appsArray[index];
+        showModal(app, index);
+    } catch (e) {
+        console.error('Failed to edit app', e);
+    }
+}
+document.getElementById('addAppBtn').addEventListener('click', () => showModal());
+function showModal(app = null, index = null) {
+    const modal = document.getElementById('appModal');
+    const title = document.getElementById('modalTitle');
+    const nameInput = document.getElementById('appNameInput');
+    const urlInput = document.getElementById('appUrlInput');
+    const saveBtn = document.getElementById('saveAppBtn');
+    selectedAppIndex = null;
+    if (app) {
+        title.textContent = 'Edit App';
+        nameInput.value = app.name;
+        urlInput.value = app.url;
+        saveBtn.onclick = () => saveApp(index);
+    } else {
+        title.textContent = 'Add App';
+        nameInput.value = '';
+        urlInput.value = '';
+        saveBtn.onclick = () => saveApp();
+    }
+    modal.style.display = 'flex';
+}
+async function saveApp(index = null) {
+    const name = document.getElementById('appNameInput').value.trim();
+    const url = document.getElementById('appUrlInput').value.trim();
+    if (!name || !url) return;
+    try {
+        let appsObj = await Storage.get('cooltab_apps') || {};
+        const appsArray = Object.entries(appsObj).map(([appName, data]) => ({
+            name: appName,
+            url: data.url || '',
+            icon: data.icon || ''
+        }));
+        
+        const icon = `https://favicon.is/${url}?larger=true`;
+        if (index !== null) {
+            appsArray[index] = { name, url, icon };
+        } else {
+            appsArray.push({ name, url, icon });
+        }
+        
+        const newAppsObj = {};
+        appsArray.forEach(app => {
+            newAppsObj[app.name] = { url: app.url, icon: app.icon };
+        });
+        await Storage.set('cooltab_apps', newAppsObj);
+        renderApps(appsArray);
+        hideModal();
+    } catch (e) {
+        console.error('Failed to save app', e);
+    }
+}
+function hideModal() {
+    document.getElementById('appModal').style.display = 'none';
+}
+document.getElementById('cancelAppBtn').addEventListener('click', hideModal);

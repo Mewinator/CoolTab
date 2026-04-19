@@ -88,8 +88,8 @@ function setupSearch() {
 }
 const defaultApps = {
     'Gmail': { url: 'https://mail.google.com/', icon: './img/gmail.png' },
-    'Github': { url: 'https://github.com', icon: './img/github.svg' },
-    'Figma': { url: 'https://figma.com', icon: './img/figma.png' },
+    'Github': { url: 'https://github.com', icon: './img/github.svg', pinned: true },
+    'Figma': { url: 'https://figma.com', icon: './img/figma.png', pinned: true },
     'Docs': { url: 'https://docs.google.com/document/u/0/', icon: './img/docs.png' },
     'Drive': { url: 'https://drive.google.com/', icon: './img/drive.png' },
     'Slides': { url: 'https://docs.google.com/presentation/u/0/', icon: './img/slides.png' },
@@ -101,15 +101,27 @@ const defaultApps = {
     'TinkerCAD': { url: 'https://tinkercad.com/', icon: './img/tinkercad.png' },
     'Copilot': { url: 'https://copilot.microsoft.com/', icon: './img/copilot.png' },
     'Gemini': { url: 'https://gemini.google.com/', icon: './img/gemini.png' },
-    'Claude': { url: 'https://claude.ai', icon: './img/claude.svg' }
+    'Claude': { url: 'https://claude.ai', icon: './img/claude.svg', pinned: true },
+    'Firebase Studio': { url: 'https://studio.firebase.google.com/', icon:'https://favicon.is/studio.firebase.google.com?larger=true', pinned: true },
+    'Onecompiler': { url: 'https://onecompiler.com/', icon: './img/onecompiler.png', pinned: true }
 };
 async function loadApps() {
     const grid = document.querySelector('.apps_grid');
     grid.innerHTML = '';
     let apps = await Storage.get('cooltab_apps');
+    let pinnedApps = await Storage.get('cooltab_pinned') || {};
     if (!apps) {
-        apps = defaultApps;
+        apps = {};
+        for (const name in defaultApps) {
+            apps[name] = { url: defaultApps[name].url, icon: defaultApps[name].icon };
+        }
         await Storage.set('cooltab_apps', apps);
+        for (const name in defaultApps) {
+            if (defaultApps[name].pinned) {
+                pinnedApps[name] = { url: defaultApps[name].url, icon: defaultApps[name].icon };
+            }
+        }
+        await Storage.set('cooltab_pinned', pinnedApps);
     }
     for (const name in apps) {
         if (!Object.prototype.hasOwnProperty.call(apps, name)) continue;
@@ -118,6 +130,7 @@ async function loadApps() {
         link.href = app.url || '#';
         link.title = name;
         link.classList.add('app-link');
+        link.style.position = 'relative';
         const img = document.createElement('img');
         img.src = app.icon || '';
         img.alt = name;
@@ -126,6 +139,34 @@ async function loadApps() {
         span.textContent = name;
         link.appendChild(span);
         grid.appendChild(link);
+    }
+}
+async function togglePinApp(name, app, pin) {
+    let pinned = await Storage.get('cooltab_pinned') || {};
+    if (pin) {
+        pinned[name] = app;
+    } else {
+        delete pinned[name];
+    }
+    await Storage.set('cooltab_pinned', pinned);
+    await loadApps();
+    await loadPinnedAppsBar();
+}
+async function loadPinnedAppsBar() {
+    const bar = document.querySelector('.bottom_bar');
+    bar.innerHTML = '';
+    const pinned = await Storage.get('cooltab_pinned') || {};
+    for (const name in pinned) {
+        if (!Object.prototype.hasOwnProperty.call(pinned, name)) continue;
+        const app = pinned[name];
+        const link = document.createElement('a');
+        link.href = app.url || '#';
+        link.title = name;
+        const img = document.createElement('img');
+        img.src = app.icon || '';
+        img.alt = name;
+        link.appendChild(img);
+        bar.appendChild(link);
     }
 }
 function installAppHandlers() {
@@ -179,6 +220,7 @@ async function main() {
     setInterval(updateTime, 100);
     await updateBg();
     await loadApps();
+    await loadPinnedAppsBar();
     const bg_blendpx = await Storage.get('cooltab_bg_blendpx');
     if (bg_blendpx === true || bg_blendpx === 'True' || bg_blendpx === 'true') {
         document.querySelector('body').style.imageRendering = 'pixelated';
