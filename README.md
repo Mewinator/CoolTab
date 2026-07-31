@@ -20,7 +20,7 @@ You need to run this somewhere, it doesn't matter where, Github Pages, Vercel, o
 - [x] Allow custom wallpapers and themes
 - [ ] Add more widgets and make them customizable
 - [x] Introducing a feature to change apps on the bottom bar
-- [ ] Make CoolTab a Chrome extension
+- [x] Make CoolTab a Chrome extension
 - [ ] Allow background music
 
 #### This is under the Apache-2.0 License which means...
