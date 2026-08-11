@@ -23,11 +23,4 @@ You need to run this somewhere, it doesn't matter where, Github Pages, Vercel, o
 - [x] Make CoolTab a Chrome extension
 - [ ] Allow background music
 
-#### This is under the Apache-2.0 License which means...
-- CREDIT ME!!!
-- Including the license in any redistribution.
-- Specify significant changes to the code: e.g. Saying that you added light mode(Not that you would want to add it because it burns my eyes.)
-- You are allowed to modify it.
-- Not all guidelines are displayed here.
-
-#### Feedback is appreciated at [Google form](https://forms.gle/rCHCbyaY7PT1NN8S6)
+#### This is under the Apache-2.0 License
